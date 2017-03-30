@@ -7,3 +7,6 @@
 
 ## Plans
 - 検出範囲の設定
+
+## Usage
+python moveFrameSubtraction_job.py [sensi]
