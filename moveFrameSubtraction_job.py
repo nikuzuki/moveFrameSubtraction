@@ -1,9 +1,10 @@
 '''
     動体検知
-    - フレーム差分の
+    - フレーム差分から動体を検知
+    - 感度設定変更可能
 '''
 # -*- coding: UTF-8 -*-
-
+import sys
 import cv2
 import numpy as np
 
@@ -17,6 +18,10 @@ sorceImg3 = None
 # 認識画像の名前
 filename = "./images/image"
 filenum = 1
+
+
+sensi = sys.argv[1] # 引数:動体検知の感度
+print(sensi)
 
 # カメラからキャプチャ
 cap = cv2.VideoCapture(0)
@@ -73,9 +78,10 @@ while(cap.isOpened()):
                 maxLabelNum = i
 
         if maxLabelNum != 0:    # 大きなラベルが存在したら
-            if maxLabel > 1000:  # そのラベルの画素数が500を超えていたら
+            if maxLabel > int(sensi):  # そのラベルの画素数がsensiを超えていたら
                 print("DP")
                 cv2.imwrite(filename + str(filenum) + ".jpg", frame)
+                print(sensi)
                 filenum += 1
                 DPImage = frame
 
