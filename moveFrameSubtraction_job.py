@@ -2,6 +2,7 @@
     動体検知
     - フレーム差分から動体を検知
     - 感度設定変更可能
+    - 範囲設定
 '''
 # -*- coding: UTF-8 -*-
 import sys
@@ -21,10 +22,21 @@ filenum = 1
 
 
 sensi = sys.argv[1] # 引数:動体検知の感度
-print(sensi)
+areamode = sys.argv[2] # 範囲設定
+areaXLU = sys.argv[3]   # 左上X座標
+areaYLU = sys.argv[4]   # 左上Y座標
+areaXRD = sys.argv[5]   # 右下X座標
+areaYRD = sys.argv[6]   # 右下Y座標
 
 # カメラからキャプチャ
 cap = cv2.VideoCapture(0)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+if(int(areaXRD) == 0):
+    areaXRD = width
+
+if(int(areaYRD) == 0):
+    areaYRD = height
 
 while(cap.isOpened()):
     ret, frame = cap.read()
@@ -47,7 +59,6 @@ while(cap.isOpened()):
 
         # 二値化された差分画像の共有部分を取得
         andImg = cv2.bitwise_and(diffImg1_2b, diffImg2_3b)
-        #cv2.imshow("andImg", andImg)
 
         # 膨張/収縮処理用の配列(uint8は符号なし8bit整数型)
         operator = np.ones((3, 3), np.uint8)
@@ -58,8 +69,17 @@ while(cap.isOpened()):
         # 膨張処理
         dilateImg = cv2.dilate(ctImg, operator, iterations = 1)
 
+        # フレーム差分結果
         resultImg = cv2.bitwise_and(sorceImg2, dilateImg)
         cv2.imshow("resultImg", resultImg)
+
+        # 範囲設定より検出を行うエリアの絞込み
+        if(int(areamode) == 1):
+            print("areamode")
+            '''
+            cv2.rectangle(resultImg, area, 0, )
+            cv2.imshow("newResultImg", resultImg)
+            '''
 
         grayImg = cv2.cvtColor(resultImg, cv2.COLOR_BGR2GRAY)
 
