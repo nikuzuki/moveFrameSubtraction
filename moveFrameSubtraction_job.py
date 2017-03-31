@@ -28,15 +28,22 @@ areaYLU = sys.argv[4]   # 左上Y座標
 areaXRD = sys.argv[5]   # 右下X座標
 areaYRD = sys.argv[6]   # 右下Y座標
 
+areaXLU = int(areaXLU)
+areaYLU = int(areaYLU)
+areaXRD = int(areaXRD)
+areaYRD = int(areaYRD)
+color = (0, 0, 0)
+
 # カメラからキャプチャ
 cap = cv2.VideoCapture(0)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+print(height, width)
 if(int(areaXRD) == 0):
-    areaXRD = width
+    areaXRD = int(width)
 
 if(int(areaYRD) == 0):
-    areaYRD = height
+    areaYRD = int(height)
 
 while(cap.isOpened()):
     ret, frame = cap.read()
@@ -75,11 +82,15 @@ while(cap.isOpened()):
 
         # 範囲設定より検出を行うエリアの絞込み
         if(int(areamode) == 1):
-            print("areamode")
-            '''
-            cv2.rectangle(resultImg, area, 0, )
+
+            cv2.rectangle(resultImg, (0, 0), (int(width), areaYLU), color, -1) #上部制限
+
+            cv2.rectangle(resultImg, (0, areaYLU), (areaXLU, int(height)), color, -1) #左部制限
+            cv2.rectangle(resultImg, (areaXRD, areaYLU), (int(width), int(height)), color, -1) #右部制限
+            cv2.rectangle(resultImg, (areaXLU, areaYRD), (areaXRD, int(height)), color, -1) #下部制限
+
             cv2.imshow("newResultImg", resultImg)
-            '''
+
 
         grayImg = cv2.cvtColor(resultImg, cv2.COLOR_BGR2GRAY)
 
@@ -87,6 +98,7 @@ while(cap.isOpened()):
         labelnum, labelimg, contours, GoCs = cv2.connectedComponentsWithStats(grayImg)
 
         #cv2.imshow("grayImg", grayImg)
+        cv2.rectangle(frame, (areaXLU, areaYLU), (areaXRD, areaYRD), (0, 0, 255), 1)
         cv2.imshow("frame", frame)
 
         # ラベリング処理の結果から最も大きいラベルのみ色塗りを行う
@@ -110,7 +122,7 @@ while(cap.isOpened()):
                 print(centerX, centerY)
 
                 cv2.circle(DPImage, (centerX, centerY), 50, (0, 255, 0), 3)
-
+                cv2.rectangle(DPImage, (areaXLU, areaYLU), (areaXRD, areaYRD), (0, 0, 255), 1)
                 cv2.imshow("Detection Point", DPImage)
 
 
